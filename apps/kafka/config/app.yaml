@@ -1,0 +1,21 @@
+version: 1.0.0
+
+kafka_common:
+    bootstrap.servers: adm:9092
+
+kafka_producer_cfg:
+    messages_send: 1
+    topic_name: lab
+    data_file: data/flow.json    
+
+kafka_producer_properties:
+    client.id: vhl_producer
+
+#kafka.streams.cfg:
+#    topic.name=vhl
+
+#kafka.streams.properties:
+#    application.id: vhl-grp
+#    client.id: vhl_streams1
+#    group.id: vhl-grp
+#    commit.interval.ms: 3000
