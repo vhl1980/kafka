@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -15,27 +16,28 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vhl.kafka.config.KafkaProducerCfg;
+import com.vhl.kafka.config.Producer;
 import com.vhl.kafka.model.FLowSerder;
 import com.vhl.kafka.model.Flow;
 
-public class ProcessProduce {
+public class ProcessProduce implements Callable<Boolean> {
     private static final Logger logger = LoggerFactory.getLogger(ProcessProduce.class);
 
     // final Producer<Long, String> producer;
     long time = System.currentTimeMillis();
 
     private KafkaProducer<String, Flow> producer;
+    private Producer kafka_producer_cfg;
 
-    public ProcessProduce(Properties propKafka) throws IOException {
+    public ProcessProduce(Properties propKafka,Producer kafka_producer_cfg) throws IOException {
+    	this.kafka_producer_cfg = kafka_producer_cfg;
         FLowSerder flowSerde = new FLowSerder();
         producer = new KafkaProducer<>(propKafka, Serdes.String().serializer(), flowSerde.getFlowSerde().serializer());
-        
     }
 
-	public void execute(KafkaProducerCfg kafka_producer_cfg) {
+	@Override
+	public Boolean call() throws Exception {
 		Integer sendMessageCount = kafka_producer_cfg.getMessages_send();
 		String topic = kafka_producer_cfg.getTopic_name();
 		final CountDownLatch countDownLatch = new CountDownLatch(sendMessageCount);
@@ -70,7 +72,7 @@ public class ProcessProduce {
             producer.flush();
             producer.close();
         }
-		
+		return true;
 	}
 	
     

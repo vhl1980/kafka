@@ -24,7 +24,7 @@ public class OptionsApp implements Callable<ConfigApp> {
 
 	//private enum Process { produce, streams }
 
-	@Option(names = "-l", required = true,description = "@|fg(green) Enum values: ${COMPLETION-CANDIDATES}|@")
+	@Option(names = "-p", required = true,description = "@|fg(green) Enum values: ${COMPLETION-CANDIDATES}|@")
 	private EnumProcess process = null;
 
 	@Option(names = "-f", required = true, description = "File configuration APP Kafka")
