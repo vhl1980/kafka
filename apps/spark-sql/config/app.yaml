@@ -1,0 +1,11 @@
+version: 1.0.0
+
+kafkaCfg:
+    common:
+        properties:
+            bootstrap.servers: adm:9092
+    consumer:
+        topic_name: lab  
+        properties:
+            client.id: vhl_producer
+

@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vhl.kafka.config.ConfigApp;
-import com.vhl.kafka.config.EnumProcess;
 import com.vhl.kafka.connexion.KafkaConfigClient;
-import com.vhl.kafka.connexion.KafkaConfigProducer;
 import com.vhl.kafka.options.OptionsApp;
 import com.vhl.kafka.process.ProcessProduce;
 import com.vhl.kafka.process.ProcessStream;
