@@ -1,6 +1,5 @@
 package com.vhl.kafka.spark.process;
 
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.apache.spark.sql.Dataset;
@@ -10,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ProcessConsumer implements Callable<Boolean>{
+public class ProcessConsumer implements Callable<Dataset>{
 	
 	private static final Logger logger = LoggerFactory.getLogger(Process.class);
 	private String topic;
@@ -25,7 +24,7 @@ public class ProcessConsumer implements Callable<Boolean>{
 	}
 
 	@Override
-	public Boolean call() throws Exception {
+	public Dataset call() throws Exception {
 		Dataset<Row> df = spark
 				  .read()
 				  .format("kafka")
@@ -34,9 +33,10 @@ public class ProcessConsumer implements Callable<Boolean>{
 				  .option("startingOffsets", "earliest")
 				  .option("endingOffsets", "latest")
 				  .load();
-		df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)");
-		df.show(); 
-		return true;
+		
+		//df.show();
+
+		return df;
 	}
 
 }
