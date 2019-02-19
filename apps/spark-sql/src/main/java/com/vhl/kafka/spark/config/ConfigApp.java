@@ -3,18 +3,11 @@ package com.vhl.kafka.spark.config;
 
 public class ConfigApp {
 
-//	private String version;
-//	private KafkaCfg kafkaCfg;
-	private EnumProcess process;
-	
 
-//	public String getVersion() {
-//		return version;
-//	}
-//
-//	public void setVersion(String version) {
-//		this.version = version;
-//	}
+	private EnumProcess process;
+	private String fileConfig;
+
+
 	public EnumProcess getProcess() {
 		return process;
 	}
@@ -23,13 +16,15 @@ public class ConfigApp {
 		this.process = process;
 	}
 
-//	public KafkaCfg getKafkaCfg() {
-//		return kafkaCfg;
-//	}
-//
-//	public void setKafkaCfg(KafkaCfg kafkaCfg) {
-//		this.kafkaCfg = kafkaCfg;
-//	}
+	public String getFileConfig() {
+		return fileConfig;
+	}
+
+	public void setFileConfig(String fileConfig) {
+		this.fileConfig = fileConfig;
+	}
+
+
 
 
 }

@@ -21,7 +21,7 @@ public class OptionsApp implements Callable <ConfigApp> {
 
 	private static final Logger logger = LoggerFactory.getLogger(OptionsApp.class);
 
-	@Option(names = "-f", required = false,description = "@|fg(green) Enum values: ${COMPLETION-CANDIDATES}|@")
+	@Option(names = "-f", required = true,description = "@|fg(green) Enum values: ${COMPLETION-CANDIDATES}|@")
 	private String appConfig = null;
 
 	@Option(names = "-p", required = true,description = "@|fg(green) Enum values: ${COMPLETION-CANDIDATES}|@")
@@ -32,15 +32,14 @@ public class OptionsApp implements Callable <ConfigApp> {
 		logger.info("--------- OPTIONS SETTING -------------");
 
 		ConfigApp confYaml = new ConfigApp();
-//		Yaml yaml = new Yaml(); 
 
 		try{
 			logger.info("LOAD CONFIG");
 			logger.info(appConfig);
-//			InputStream in = Files.newInputStream(Paths.get(appConfig));
+			InputStream in = Files.newInputStream(Paths.get(appConfig));
 			
-//			confYaml = yaml.loadAs( in, ConfigApp.class );
 			confYaml.setProcess(process);
+			confYaml.setFileConfig(appConfig);
 			
 			return confYaml;
 		} catch (Exception e) {

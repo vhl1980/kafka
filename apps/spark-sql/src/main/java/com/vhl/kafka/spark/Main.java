@@ -1,5 +1,14 @@
 package com.vhl.kafka.spark;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -19,86 +28,79 @@ public class Main {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {		
+
 		//String[] t_args = { "-p","produce","-f","config/app.yaml"};
-		SparkConf conf = new SparkConf()
-				.set("spark.cassandra.connection.host", "wk1")
-		        .set("spark.cassandra.auth.username", "adm")            
-		        .set("spark.cassandra.auth.password", "adm")
-				.setAppName("SPARK SUPERSET");
-		
-		
-		SparkSession spark = SparkSession
-				  .builder()
-				  .config(conf)
-				  .getOrCreate();
-		
-		
-		
-//		spark.sparkContext().addFile("app.yaml");
-//		String te = SparkFiles.getRootDirectory();
-//		//SparkFiles.get("app.yaml");
-//		String d = te+"/app.yaml";
-//		logger.info(d);
-//		logger.info("*************************");
-//		String[] t_args = { "-p","produce","-f", d};
-//		
-//		logger.info("TOOT : "+te);
-		
+
 		ConfigApp confApp = CommandLine.call(new OptionsApp(), args);
 		logger.info("Process : "+confApp.getProcess());
 
 
-		//		logger.info(confApp.getVersion());
 
-		//		
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
 
-		//		Dataset<Row> df = spark
-		//				  .read()
-		//				  .format("kafka")
-		//				  .option("kafka.bootstrap.servers", "adm:9092")
-		//				  .option("subscribe", "lab")
-		//				  .option("startingOffsets", "earliest")
-		//				  .option("endingOffsets", "latest")
-		//				  .load();
-		//		df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)");
-		//		df.show(); 
+			input = new FileInputStream(confApp.getFileConfig());
 
-		//		KafkaConfigClient cfgClient = new KafkaConfigClient(confApp.getKafkaCfg().getCommon().getProperties());
+			// load a properties file
+			prop.load(input);
 
-		switch (confApp.getProcess()) {
-		case produce:
-			break;
-		case consume:
+			// get the property value and print it out
 
-			//cfgClient.loadCLientProperties(confApp.getKafkaCfg().getConsumer().getProperties());
-			//cfgClient.getPropsClient().forEach((k, v) -> logger.info(k + ":" + v));
+			String host = prop.getProperty("cassandra.host");
+			String user= prop.getProperty("cassandra.user");
+			String pass= prop.getProperty("cassandra.password");
+			logger.info(prop.getProperty("browser"));
+			logger.info(host);
+			logger.info(user);
+			logger.info(pass);
 
-
-
-						ProcessConsumer p = new ProcessConsumer("adm:9092","lab",spark);
-						try {
-							Dataset<Row> df = p.call();
-							//df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)");
-							Dataset<Row> serJson = df.selectExpr("CAST(value AS STRING)");
-							serJson.show();
-							ProcessDerJson pDer = new ProcessDerJson(serJson);
-						} catch (Exception e) {
-							logger.error(e.getMessage());
-						}
-
-			break;
-		case casRead:
-			ProcessCasRead pCas = new ProcessCasRead(spark);
-			pCas.excute();	
-			
-			
-			break;
-		default:
-			logger.error("PROCESS NO EXIST");
-			break; 
+			SparkConf conf = new SparkConf()
+					.set("spark.cassandra.connection.host", host)
+					.set("spark.cassandra.auth.username", user)            
+					.set("spark.cassandra.auth.password", pass)
+					.setAppName("SPARK SUPERSET");
 
 
+			SparkSession spark = SparkSession
+					.builder()
+					.config(conf)
+					.getOrCreate();	
+
+			switch (confApp.getProcess()) {
+			case produce:
+				break;
+			case consume:
+
+
+				ProcessConsumer p = new ProcessConsumer("adm:9092","lab",spark);
+				try {
+					Dataset<Row> df = p.call();
+					//df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)");
+					Dataset<Row> serJson = df.selectExpr("CAST(value AS STRING)");
+					serJson.show();
+					ProcessDerJson pDer = new ProcessDerJson(serJson);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+
+				break;
+			case casRead:
+				ProcessCasRead pCas = new ProcessCasRead(spark);
+				pCas.excute();	
+
+
+				break;
+			default:
+				logger.error("PROCESS NO EXIST");
+				break; 
+
+
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
-
 	}
+
+
 }
