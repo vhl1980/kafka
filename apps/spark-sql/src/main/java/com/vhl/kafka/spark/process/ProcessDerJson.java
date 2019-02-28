@@ -1,11 +1,8 @@
 package com.vhl.kafka.spark.process;
 
-import java.util.HashMap;
-
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
-import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
@@ -31,23 +28,10 @@ public class ProcessDerJson {
 	    };
 		
 	    schema = new StructType(structFields);
-		
-	    
-	    
-	    //.select(from_json(col("value").cast("string"), schema, jsonOptions).alias("parsed_value"))
 	}
 	
 	public Dataset<Row> derJson() {
-		
-		//df.withColumns("value", functions.from_json(df.col("value"), schema), new HashMap<>());
-		
-		Dataset<Row> derNadia =  df.withColumn("value",
-	            functions.from_json(df.col("value"),schema, new HashMap<>()));
-		
-		Dataset<Row> der =  df.select(functions.from_json(functions.col("value"),schema).as("json"));
-
-		derNadia.printSchema();
-		derNadia.show();
+		Dataset<Row> der =  df.select(functions.from_json(functions.col("value"),schema).as("json")).select("json.*");
 		
 		logger.info("--------------------");
 		

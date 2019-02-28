@@ -34,31 +34,19 @@ public class Main {
 		ConfigApp confApp = CommandLine.call(new OptionsApp(), args);
 		logger.info("Process : "+confApp.getProcess());
 
-
-
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
-
 			input = new FileInputStream(confApp.getFileConfig());
-
 			// load a properties file
 			prop.load(input);
 
-			// get the property value and print it out
-
-			String host = prop.getProperty("cassandra.host");
-			String user= prop.getProperty("cassandra.user");
-			String pass= prop.getProperty("cassandra.password");
-			logger.info(prop.getProperty("browser"));
-			logger.info(host);
-			logger.info(user);
-			logger.info(pass);
+			String brokers = prop.getProperty("kafka.brokers");
+			String topic= prop.getProperty("kafka.topic");
+			logger.info("------------------------- KAFKA BROKERS : "+brokers);
+			logger.info("------------------------- KAFKA TOPIC : "+topic);
 
 			SparkConf conf = new SparkConf()
-					.set("spark.cassandra.connection.host", host)
-					.set("spark.cassandra.auth.username", user)            
-					.set("spark.cassandra.auth.password", pass)
 					.setAppName("SPARK SUPERSET");
 
 
@@ -71,35 +59,33 @@ public class Main {
 			case produce:
 				break;
 			case consume:
-
-
-				ProcessConsumer p = new ProcessConsumer("adm:9092","lab",spark);
+				ProcessConsumer p = new ProcessConsumer(brokers,topic,spark);
 				try {
 					Dataset<Row> df = p.call();
+					df.printSchema();
 					//df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)");
 					Dataset<Row> serJson = df.selectExpr("CAST(value AS STRING)");
 					serJson.show();
 					ProcessDerJson pDer = new ProcessDerJson(serJson);
+					pDer.derJson();
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
-
 				break;
 			case casRead:
 				ProcessCasRead pCas = new ProcessCasRead(spark);
 				pCas.excute();	
-
-
 				break;
 			default:
 				logger.error("PROCESS NO EXIST");
 				break; 
-
-
 			}
+			spark.close();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+
+
 	}
 
 

@@ -55,6 +55,7 @@ public class ProcessCasRead {
 				logger.info(test);
 			}
 			
+			cassandra.close();
 			
 		}catch (Exception e) {
 			logger.error(e.getMessage());
